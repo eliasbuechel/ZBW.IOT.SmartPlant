@@ -11,6 +11,7 @@ bool AnalogSensor::execute()
     
     return true;
 }
+
 float AnalogSensor::getValue() const
 {
     return m_Value;

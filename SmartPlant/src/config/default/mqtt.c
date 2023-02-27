@@ -26,7 +26,7 @@ ENV_WEAK const char *MQTT_CLIENT_ID = "";
  /**
   * @brief The MQTT broker's IP address to connect to.
   */
-ENV_WEAK const char *MQTT_BROKER_IP = "172.20.10.11"; //127.0.0.1
+ENV_WEAK const char *MQTT_BROKER_IP = "172.20.10.11";
 
 /**
  * @brief The MQTT broker's port to connect to.

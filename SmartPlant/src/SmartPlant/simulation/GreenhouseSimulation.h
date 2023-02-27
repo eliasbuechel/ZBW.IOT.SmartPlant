@@ -17,7 +17,6 @@ namespace Greenhouse
     private:
         AnalogSignalSimulator m_Co2LevelSimulator;
         AnalogSignalSimulator m_TempInsideSimulator;
-        AnalogSignalSimulator m_TempOutsideSimulator;
 
         WindowSimulator m_WindowSimulator;
         BoolSimulator m_RainSimulator;

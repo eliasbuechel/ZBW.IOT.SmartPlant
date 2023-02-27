@@ -29,12 +29,12 @@ namespace Greenhouse
         // analog inputs
         AnalogSensor& co2LevelSensor;
         AnalogSensor& tempInsideSensor;
-        AnalogSensor& tempOutsideSensor;
+        float& tempOutside;
 
         // digital inputs
         const bool& DI_WindowOpen;
         const bool& DI_WindowClosed;
-        const bool& DI_IsRaining;
+        bool& IsRaining;
 
         // digital outputs
         bool& DO_AddingCO2;
@@ -46,10 +46,11 @@ namespace Greenhouse
     {
     public:
         Greenhouse(const GreenhouseConfig& config, GreenhouseSignals& signals);
+        bool configure();
         bool execute();
     
     private:
-        bool evaluateTemperationNeccesary(const AnalogSensor& tempInsideSensor, const AnalogSensor& tempOutsideSensor) const;
+        bool evaluateTemperationNeccesary(const AnalogSensor& tempInsideSensor, const float& tempOutside) const;
         void controlCO2Addition(CO2Condition co2Condition);
         void controlVentilation(CO2Condition co2Condition, bool isTemperationNeccesary);
         CO2Condition getCO2Condition(const AnalogSensor& co2LevelSensor) const;
@@ -60,5 +61,8 @@ namespace Greenhouse
         
         WindowCtrl* m_WindowCtrl;
         WindowSignals m_WindowSignals;
+
+        static void onCurrentTemperatureHandler(void *context, const char *topic, const void *data, size_t len);
+        static void onCurrentPropabilityOfRainHandler(void *context, const char *topic, const void *data, size_t len);
     };
 }

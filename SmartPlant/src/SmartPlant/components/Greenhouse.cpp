@@ -1,5 +1,8 @@
 #include "Greenhouse.h"
 
+#include "../library/Communication.h"
+#include "WString.h"
+
 
 Greenhouse::Greenhouse::Greenhouse(const GreenhouseConfig& config, GreenhouseSignals& signals)
     : c_Config(config), m_Signals(signals),
@@ -18,7 +21,7 @@ bool Greenhouse::Greenhouse::execute()
 {
     m_WindowCtrl->execute();
 
-    bool isTemperationNeccesary = evaluateTemperationNeccesary(m_Signals.tempInsideSensor, m_Signals.tempOutsideSensor);
+    bool isTemperationNeccesary = evaluateTemperationNeccesary(m_Signals.tempInsideSensor, m_Signals.tempOutside);
     CO2Condition co2Condition = getCO2Condition(m_Signals.co2LevelSensor);
     
     controlCO2Addition(co2Condition);
@@ -26,10 +29,9 @@ bool Greenhouse::Greenhouse::execute()
     return true;
 }
 
-bool Greenhouse::Greenhouse::evaluateTemperationNeccesary(const AnalogSensor& tempInsideSensor, const AnalogSensor& tempOutsideSensor) const
+bool Greenhouse::Greenhouse::evaluateTemperationNeccesary(const AnalogSensor& tempInsideSensor, const float& tempOutside) const
 {
     float tempInside = tempInsideSensor.getValue();
-    float tempOutside = tempOutsideSensor.getValue();
     
     if (tempInside < c_Config.MIN_OPTIMAL_TEMP && tempInside > tempOutside)
         return true;
@@ -84,4 +86,32 @@ Greenhouse::CO2Condition Greenhouse::Greenhouse::getCO2Condition(const AnalogSen
         return CO2Condition::MIN;
 
     return CO2Condition::OK;
+}
+
+void Greenhouse::Greenhouse::onCurrentTemperatureHandler(void *context, const char *topic, const void *data, size_t len)
+{
+    Greenhouse* greenhouse = (Greenhouse*)context;
+
+    const char *payload = (const char *)data;
+    float currentOutsideTemperature = String(payload).toFloat();
+
+    greenhouse->m_Signals.tempOutside = currentOutsideTemperature;
+}
+
+void Greenhouse::Greenhouse::onCurrentPropabilityOfRainHandler(void *context, const char *topic, const void *data, size_t len)
+{
+    Greenhouse* greenhouse = (Greenhouse*)context;
+    
+    const char *payload = (const char *)data;
+    float currentPropabilityOfRain = String(payload).toFloat();
+
+    greenhouse->m_Signals.IsRaining = currentPropabilityOfRain > 0.5f;
+}
+
+bool Greenhouse::Greenhouse::configure()
+{
+    Communication::mqttClient.subscribe("SmartPlant/WeatherData/currentTemperature", onCurrentPropabilityOfRainHandler, this);
+    Communication::mqttClient.subscribe("SmartPlant/WeatherData/currentPropabilityOfRain", onCurrentPropabilityOfRainHandler, this);
+    
+    return true;
 }
