@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Sparkfun_Qwiic_Button.h>
+
 #include "AnalogSignalSimulator.h"
 #include "WindowSimulator.h"
 #include "RainSimulator.h"
@@ -12,7 +14,7 @@ namespace Greenhouse
     {
     public:
         GreenhouseSimulation(GreenhouseSignals& signals);
-        bool execute();
+        bool execute(QwiicButton& button);
 
     private:
         AnalogSignalSimulator m_Co2LevelSimulator;
@@ -20,5 +22,10 @@ namespace Greenhouse
 
         WindowSimulator m_WindowSimulator;
         BoolSimulator m_RainSimulator;
+
+        bool executeButtonRainSimulation(QwiicButton& button);
+
+        bool& m_IsRainingSignal;
+        bool m_ButtonIsRainingState;
     };
 }

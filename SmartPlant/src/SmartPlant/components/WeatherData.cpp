@@ -16,7 +16,7 @@ static const char* zipCode = "8001";
 static const char* countryCode = "ch";
 
 // Define the HTTP client object and API endpoint URL
-static HTTPClient httpClient;
+// static HTTPClient httpClient;
 static String currentUrl = "http://api.openweathermap.org/data/2.5/weather?zip=" + String(zipCode) + "," + String(countryCode) + "&units=metric&appid=" + String(apiKey);
 static String forecastUrl = "http://api.openweathermap.org/data/2.5/forecast?zip=" + String(zipCode) + "," + String(countryCode) + "&units=metric&appid=" + String(apiKey) + "&cnt=4";
 
@@ -27,7 +27,9 @@ static int getWeatherData(String& wetherData, const String& url)
 {
     int httpResponseCode;
 
-    httpClient.begin(Communication::wifiManager.operator WiFiClient &(), url);
+    HTTPClient httpClient;
+
+    httpClient.begin(Communication::wifiManager, url);
     httpResponseCode = httpClient.GET();
 
     if (httpResponseCode != HTTP_CODE_OK) {
@@ -112,8 +114,9 @@ static bool getCurrentWeatherData(JsonObject& weatherData)
         Serial.println(httpResponseCode);
         return false;
     }
-    // Serial.println("Current wether data:");
-    // Serial.println(currentWeatherData);
+
+    Serial.println("Current wether data:");
+    Serial.println(currentWeatherData);
 
     weatherData.clear();
     if (!convertToJsonObject(weatherData, currentWeatherData))
@@ -134,8 +137,9 @@ static bool getForecastWeatherData(JsonObject& weatherData)
         Serial.println(httpResponseCode);
         return false;
     }
-    // Serial.println("Forecast wether data:");
-    // Serial.println(forecastWeatherData);
+    
+    Serial.println("Forecast wether data:");
+    Serial.println(forecastWeatherData);
 
     weatherData.clear();
     if (!convertToJsonObject(weatherData, forecastWeatherData))
@@ -176,23 +180,6 @@ static bool refreshWeatherData()
     return true;
 }
 
-static bool testRefreshWeatherData()
-{
-    float currentTemperature = 0.73f;
-    float currentPropabilityOfRain = 0.35f;
-    float forecastPropabilityOfRain_12h = 0.12f;
-    bool isAboveFreezing = currentTemperature > 0.0f;
-
-    Communication::mqttClient.publish("SmartPlant/WeatherData/location/zipCode", String(zipCode));
-    Communication::mqttClient.publish("SmartPlant/WeatherData/location/countryCode", String(countryCode));
-    Communication::mqttClient.publish("SmartPlant/WeatherData/currentTemperature", String(currentTemperature));
-    Communication::mqttClient.publish("SmartPlant/WeatherData/currentPropabilityOfRain", String(currentPropabilityOfRain));
-    Communication::mqttClient.publish("SmartPlant/WeatherData/forecastPropabilityOfRain_12h", String(forecastPropabilityOfRain_12h));
-    Communication::mqttClient.publish("SmartPlant/WeatherData/isAboveFreezing", String(isAboveFreezing));
-    
-    return true;
-}
-
 bool WetherData::execute()
 {
     if (!startedTimer)
@@ -207,7 +194,9 @@ bool WetherData::execute()
     if (!Communication::wifiManager.connected())
         return false;
 
+    if (!Communication::mqttClient.connected())
+        return false;
+
     wetherRefreshTimer.restart();
-    return testRefreshWeatherData();
-    // return refreshWeatherData();
+    return refreshWeatherData();
 }

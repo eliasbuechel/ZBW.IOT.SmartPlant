@@ -1,16 +1,10 @@
 #pragma once
 
 #include <QwiicLedStick.h>
-#include "Greenhouse.h"
+#include <Sparkfun_Qwiic_Button.h>
 
 namespace SmartPlant
 {
-    namespace Greenhouse_Test
-    {
-        bool configure();
-        bool execute(LED& leds);
-    }
-
     bool configure();
-    bool execute(LED& leds);
+    bool execute(LED& leds, QwiicButton& button);
 }

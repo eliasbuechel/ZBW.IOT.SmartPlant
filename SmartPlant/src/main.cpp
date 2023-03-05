@@ -12,10 +12,23 @@
 
 #include "SmartPlant/components/SmartPlant.h"
 
-
 // ----- SETUP -----
 static LED leds = LED();
 static QwiicButton button = QwiicButton();
+
+static bool initLeds();
+static bool initButton();
+static bool initQwiicPeripherals();
+
+void setup()
+{
+  Serial.begin(115200);
+  Serial.println("Booting Smartplant...");
+
+  initQwiicPeripherals();
+  Communication::connecting();
+  SmartPlant::configure();
+}
 
 static bool initLeds()
 {
@@ -67,47 +80,11 @@ static bool initQwiicPeripherals()
 }
 
 
-static ZbW::StopWatch _timeout = ZbW::StopWatch(1000);
-static bool _toggle = false;
-
-void setup()
-{
-  Serial.begin(115200);
-  Serial.println("Booting Smartplant...");
-
-  initQwiicPeripherals();
-  Communication::connecting();
-  SmartPlant::configure();
-
-  _timeout.restart();
-}
-
 // ----- LOOP -----
 static ZbW::StopWatch cycleTime = ZbW::StopWatch(100);
 static bool cycleFlag = false;
 
-
-
-static void ToggleTask() {
-  if (_timeout.isTimeout()) {
-    Communication::mqttClient.publish("demo/toggle", _toggle ? "on" : "off");
-    _toggle = !_toggle;
-    _timeout.restart();
-  }
-}
-
-
-
-static bool execute()
-{
-  Communication::execute();
-  SmartPlant::execute(leds);
-
-  if (Communication::wifiManager.connected())
-    ToggleTask();
-
-  return true;
-}
+static bool execute();
 
 void loop() {
   cycleTime.restart();
@@ -118,4 +95,12 @@ void loop() {
 
   while (!cycleTime.isTimeout())
     delay(5);
+}
+
+static bool execute()
+{
+  Communication::execute();
+  SmartPlant::execute(leds, button);
+
+  return true;
 }

@@ -6,9 +6,6 @@
 #include "WindowCtrl.h"
 #include "../library/AnalogSensor.h"
 
-
-
-
 namespace Greenhouse
 {
     enum CO2Condition
@@ -45,7 +42,7 @@ namespace Greenhouse
     class Greenhouse
     {
     public:
-        Greenhouse(const GreenhouseConfig& config, GreenhouseSignals& signals);
+        Greenhouse(const GreenhouseConfig& config, GreenhouseSignals& signals, const char* topic, const char* weatherdataTopic);
         bool configure();
         bool execute();
     
@@ -58,6 +55,9 @@ namespace Greenhouse
     private:
         const GreenhouseConfig& c_Config;
         GreenhouseSignals& m_Signals;
+
+        const char* m_Topic;
+        const char* m_WeatherDataTopic;
         
         WindowCtrl* m_WindowCtrl;
         WindowSignals m_WindowSignals;

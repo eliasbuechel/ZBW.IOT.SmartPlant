@@ -10,6 +10,7 @@ struct RGBColor
 
     RGBColor(bool value);
     RGBColor(const unsigned int value, unsigned int lowerBound, unsigned int upperBound);
+    RGBColor(const float value, float lowerBound, float upperBound);
 };
 
 void setLEDColor(LED& leds, uint8_t index, RGBColor color);

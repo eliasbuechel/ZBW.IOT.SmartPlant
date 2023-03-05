@@ -4,8 +4,8 @@
 #include "WString.h"
 
 
-Greenhouse::Greenhouse::Greenhouse(const GreenhouseConfig& config, GreenhouseSignals& signals)
-    : c_Config(config), m_Signals(signals),
+Greenhouse::Greenhouse::Greenhouse(const GreenhouseConfig& config, GreenhouseSignals& signals, const char* topic, const char* weatherdataTopic)
+    : c_Config(config), m_Signals(signals), m_Topic(topic), m_WeatherDataTopic(weatherdataTopic),
       m_WindowSignals(WindowSignals
                         {
                             m_Signals.DI_WindowOpen,
@@ -110,8 +110,11 @@ void Greenhouse::Greenhouse::onCurrentPropabilityOfRainHandler(void *context, co
 
 bool Greenhouse::Greenhouse::configure()
 {
-    Communication::mqttClient.subscribe("SmartPlant/WeatherData/currentTemperature", onCurrentPropabilityOfRainHandler, this);
-    Communication::mqttClient.subscribe("SmartPlant/WeatherData/currentPropabilityOfRain", onCurrentPropabilityOfRainHandler, this);
+    String currentTemperaturetopic = String(m_WeatherDataTopic) + "/currentTemperature";
+    String currentPropabilityOfRainTopic = String(m_WeatherDataTopic) + "/currentPropabilityOfRain";
+
+    Communication::mqttClient.subscribe(currentTemperaturetopic.c_str(), onCurrentPropabilityOfRainHandler, this);
+    Communication::mqttClient.subscribe(currentPropabilityOfRainTopic.c_str(), onCurrentPropabilityOfRainHandler, this);
     
     return true;
 }

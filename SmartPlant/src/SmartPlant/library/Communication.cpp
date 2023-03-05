@@ -8,21 +8,6 @@ ZbW::CommSubsystem::MqttClient Communication::mqttClient = ZbW::CommSubsystem::M
 
 void Communication::connecting()
 {
-    /*
-    wifiManager.reset();
-    mqttClient.reset();
-
-    // WiFi
-    Serial.println("WiFi: Initiating connection...");
-    wifiManager.connect(SECRET_WIFI_SSID, SECRET_WIFI_PASSWORD);
-
-    // MQTT
-    Serial.println("MQTT: Initiating connection...");
-    mqttClient.CredentialsSet(MQTT_USERNAME, MQTT_PASSWORD);
-    mqttClient.connect(MQTT_CLIENT_ID, MQTT_BROKER_IP, MQTT_BROKER_PORT);
-    */
-
-
     Serial.print("Resetting WiFi...");
     wifiManager.reset();
     Serial.println("done");
